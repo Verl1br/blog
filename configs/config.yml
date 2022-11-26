@@ -1,0 +1,9 @@
+port: "8000"
+uri: "neo4j://localhost:7687/neo4j"
+username: "neo4j"
+db:
+    username: "postgres"
+    host: "localhost"
+    port: "5432"
+    dbname: "blog"
+    sslmode: "disable"

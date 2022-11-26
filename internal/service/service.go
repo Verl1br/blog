@@ -1,8 +1,12 @@
 package service
 
+import (
+	"github.com/dhevve/blog/internal/repository"
+)
+
 type Service struct {
 }
 
-func NewService() *Service {
+func NewService(repo *repository.Repository) *Service {
 	return &Service{}
 }
