@@ -12,12 +12,15 @@ import (
 	"github.com/dhevve/blog/internal/handler"
 	"github.com/dhevve/blog/internal/repository"
 	"github.com/dhevve/blog/internal/service"
+	"github.com/go-playground/validator/v10"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"github.com/neo4j/neo4j-go-driver/v4/neo4j"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
+
+var validate *validator.Validate
 
 func main() {
 	if err := intiConfig(); err != nil {
@@ -27,6 +30,8 @@ func main() {
 	if err := godotenv.Load(); err != nil {
 		logrus.Fatalf("dotenv %s", err.Error())
 	}
+
+	validate = validator.New()
 
 	driver, err := neo4j.NewDriver(viper.GetString("uri"), neo4j.BasicAuth(viper.GetString("uesrname"), os.Getenv("DB_PASSWORD"), ""))
 	if err != nil {
@@ -48,7 +53,7 @@ func main() {
 
 	repo := repository.NewRepository(db, driver)
 	services := service.NewService(repo)
-	handlers := handler.NewHandler(services)
+	handlers := handler.NewHandler(services, validate)
 	srv := new(blog.Server)
 
 	go func() {
