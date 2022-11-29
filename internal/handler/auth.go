@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/dhevve/blog/internal/model"
@@ -21,7 +20,7 @@ func (h *Handler) signUp(c *gin.Context) {
 	err := h.validate.Struct(user)
 	if err != nil {
 		if _, ok := err.(*validator.InvalidValidationError); ok {
-			fmt.Println(err)
+			logrus.Info(err.Error())
 			return
 		}
 
@@ -53,12 +52,12 @@ func (h *Handler) signIn(c *gin.Context) {
 	err := h.validate.Struct(input)
 	if err != nil {
 		if _, ok := err.(*validator.InvalidValidationError); ok {
-			fmt.Println(err)
+			logrus.Info(err.Error())
 			return
 		}
 
 		for _, err := range err.(validator.ValidationErrors) {
-			logrus.Fatalf("Validate Error: %s", err)
+			logrus.Errorf("Validate Error: %s", err)
 		}
 
 		return
@@ -66,7 +65,7 @@ func (h *Handler) signIn(c *gin.Context) {
 
 	token, err := h.services.Authorization.GenerateToken(input.Email, input.Password)
 	if err != nil {
-		logrus.Fatalf("GenerateToken Error: %s", err)
+		logrus.Errorf("GenerateToken Error: %s", err)
 		return
 	}
 

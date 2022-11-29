@@ -19,7 +19,7 @@ func NewPostRepository(db *sqlx.DB) *PostRepository {
 func (r *PostRepository) CreatePost(post model.Post) (int, error) {
 	var id int
 
-	query := fmt.Sprintf("INSERT INTO %s (title, content, user_id) VALUES ($1, $2, $3) RETURNING id", "posts")
+	query := fmt.Sprintf("INSERT INTO %s (title, content, user_id) VALUES ($1, $2, $3) RETURNING id", postTable)
 
 	row := r.db.QueryRow(query, post.Title, post.Content, post.UserId)
 	if err := row.Scan(&id); err != nil {
@@ -32,7 +32,7 @@ func (r *PostRepository) CreatePost(post model.Post) (int, error) {
 func (r *PostRepository) GetPost(postId, userId int) (model.Post, error) {
 	var post model.Post
 
-	query := fmt.Sprintf("SELECT * FROM %s WHERE id = $1 AND user_id = $2", "posts")
+	query := fmt.Sprintf("SELECT * FROM %s WHERE id = $1 AND user_id = $2", postTable)
 	err := r.db.Get(&post, query, postId, userId)
 	return post, err
 }
@@ -40,13 +40,13 @@ func (r *PostRepository) GetPost(postId, userId int) (model.Post, error) {
 func (r *PostRepository) GetPosts(userId int) ([]model.Post, error) {
 	var posts []model.Post
 
-	query := fmt.Sprintf("SELECT * FROM %s WHERE user_id = $1", "posts")
+	query := fmt.Sprintf("SELECT * FROM %s WHERE user_id = $1", postTable)
 	err := r.db.Select(&posts, query, userId)
 	return posts, err
 }
 
 func (r *PostRepository) DeletePost(postId int) error {
-	query := fmt.Sprintf("DELETE FROM %s WHERE id = $1", "posts")
+	query := fmt.Sprintf("DELETE FROM %s WHERE id = $1", postTable)
 	_, err := r.db.Exec(query, postId)
 	return err
 }
