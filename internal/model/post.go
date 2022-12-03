@@ -6,7 +6,7 @@ type Post struct {
 	Id          int       `json:"-" db:"id"`
 	Title       string    `json:"title" validate:"required" db:"title"`
 	Content     string    `json:"content" validate:"required" db:"content"`
-	PublishedAt time.Time `json:"published_at" validate:"required" db:"published_at"`
+	PublishedAt time.Time `json:"published_at" db:"published_at"`
 	UserId      int       `json:"user_id" validate:"required" db:"user_id"`
 }
 

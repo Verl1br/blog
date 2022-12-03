@@ -15,6 +15,9 @@ type getAllItemsResponse struct {
 }
 
 func (h *Handler) createPost(c *gin.Context) {
+	title, _ := c.GetPostForm("title")
+	content, _ := c.GetPostForm("content")
+
 	userId, err := getUserId(c)
 	if err != nil {
 		return
@@ -22,10 +25,9 @@ func (h *Handler) createPost(c *gin.Context) {
 
 	var post model.Post
 
-	if err := c.BindJSON(&post); err != nil {
-		logrus.Errorf("BindJson Error: %s", err.Error())
-		return
-	}
+	post.Title = title
+	post.Content = content
+	post.UserId = userId
 
 	err = h.validate.Struct(post)
 	if err != nil {
@@ -41,16 +43,21 @@ func (h *Handler) createPost(c *gin.Context) {
 		return
 	}
 
-	post.UserId = userId
-
-	id, err := h.services.Post.CreatePost(post)
+	postId, err := h.services.Post.CreatePost(post)
 	if err != nil {
 		logrus.Errorf("CreatePost Error: %s", err.Error())
 		return
 	}
 
+	photoId, err := h.services.Photo.Upload(c, postId)
+	if err != nil {
+		logrus.Errorf("Upload Error: %s", err.Error())
+		return
+	}
+
 	c.JSON(http.StatusOK, map[string]interface{}{
-		"id": id,
+		"postId":  postId,
+		"photoId": photoId,
 	})
 }
 

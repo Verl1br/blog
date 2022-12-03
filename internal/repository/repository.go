@@ -3,13 +3,14 @@ package repository
 import (
 	"github.com/dhevve/blog/internal/model"
 	"github.com/jmoiron/sqlx"
-	"github.com/neo4j/neo4j-go-driver/v4/neo4j"
+	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
 )
 
 const (
 	usersTable    = "users"
 	postTable     = "posts"
 	commentsTable = "posts_comments"
+	photoTable    = "posts_photo"
 )
 
 type Authorization interface {
@@ -33,16 +34,30 @@ type Сomment interface {
 	UpdateComment(commentId int, input model.UpdateComment) error
 }
 
+type Photo interface {
+	Upload(postId int, fullFileName string) (int, error)
+	DeletePhoto(photoId int) error
+}
+
+type Friend interface {
+	GetFriends(id int) []model.User
+	CreateFriends(myId, friendId int) error
+}
+
 type Repository struct {
 	Authorization
 	Post
 	Сomment
+	Photo
+	Friend
 }
 
-func NewRepository(db *sqlx.DB, driver neo4j.Driver) *Repository {
+func NewRepository(db *sqlx.DB, driver neo4j.DriverWithContext) *Repository {
 	return &Repository{
 		Authorization: NewAuthorizationRepository(db),
 		Post:          NewPostRepository(db),
 		Сomment:       NewCommentRepository(db),
+		Photo:         NewPhotoRepository(db),
+		Friend:        NewFriendRepository(db, driver),
 	}
 }

@@ -3,6 +3,7 @@ package service
 import (
 	"github.com/dhevve/blog/internal/model"
 	"github.com/dhevve/blog/internal/repository"
+	"github.com/gin-gonic/gin"
 )
 
 type Authorization interface {
@@ -27,10 +28,22 @@ type Сomment interface {
 	UpdateComment(commentId int, input model.UpdateComment) error
 }
 
+type Photo interface {
+	Upload(c *gin.Context, postId int) (int, error)
+	DeletePhoto(photoId int) error
+}
+
+type Friend interface {
+	GetFriends(id int) []model.User
+	CreateFriends(myId, friendId int) error
+}
+
 type Service struct {
 	Authorization
 	Post
 	Сomment
+	Photo
+	Friend
 }
 
 func NewService(repo *repository.Repository) *Service {
@@ -38,5 +51,7 @@ func NewService(repo *repository.Repository) *Service {
 		Authorization: NewAuthorizationService(repo),
 		Post:          NewPostService(repo),
 		Сomment:       NewCommentService(repo),
+		Photo:         NewPhotoService(repo),
+		Friend:        NewFriendServce(repo),
 	}
 }

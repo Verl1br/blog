@@ -15,7 +15,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
-	"github.com/neo4j/neo4j-go-driver/v4/neo4j"
+	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
@@ -32,12 +32,12 @@ func main() {
 	}
 
 	validate = validator.New()
-
-	driver, err := neo4j.NewDriver(viper.GetString("uri"), neo4j.BasicAuth(viper.GetString("uesrname"), os.Getenv("DB_PASSWORD"), ""))
+	uri := "neo4j://localhost:7687"
+	auth := neo4j.BasicAuth("neo4j", "root", "")
+	driver, err := neo4j.NewDriverWithContext(uri, auth)
 	if err != nil {
 		logrus.Fatal(err.Error())
 	}
-	defer unsafeClose(driver)
 
 	db, err := repository.NewPostgresDB(repository.Config{
 		Host:     viper.GetString("db.host"),
