@@ -24,10 +24,11 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		auth.POST("/sing-in", h.signIn)
 	}
 
-	friend := router.Group("/friend")
+	friend := router.Group("/friend", h.userIdentity)
 	{
 		friend.GET("/get-friends/:id", h.getFriends)
 		friend.POST("/create-friends/:id", h.createFriends)
+		friend.DELETE("/delete-friends/:id", h.deleteFriends)
 	}
 
 	post := router.Group("/post", h.userIdentity)

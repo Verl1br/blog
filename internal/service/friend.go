@@ -20,3 +20,7 @@ func (s *FriendServce) GetFriends(id int) []model.User {
 func (s *FriendServce) CreateFriends(myId, friendId int) error {
 	return s.repo.CreateFriends(myId, friendId)
 }
+
+func (s *FriendServce) DeleteFriend(myId, friendId int) error {
+	return s.repo.DeleteFriend(myId, friendId)
+}

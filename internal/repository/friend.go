@@ -140,3 +140,31 @@ func (r *FriendRepository) CreateFriends(myId, friendId int) error {
 	}
 	return err
 }
+
+func (r *FriendRepository) DeleteFriend(myId, friendId int) error {
+	ctx := context.Background()
+
+	session := r.driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+	defer session.Close(ctx)
+
+	deleteRelationshipBetweenPeopleQuery := `
+		MATCH (f1:Friends) WHERE f1.user_id = $id1
+		MATCH (f2:Friends) WHERE f2.user_id = $id2 
+		MATCH (f1)-[r:FRIEND]->(f2) 
+		DELETE r;`
+
+	_, err := session.ExecuteWrite(ctx,
+		func(tx neo4j.ManagedTransaction) (any, error) {
+			result, err := tx.Run(ctx, deleteRelationshipBetweenPeopleQuery, map[string]any{
+				"id1": myId,
+				"id2": friendId,
+			})
+			if err != nil {
+				return nil, err
+			}
+
+			return result.Collect(ctx)
+		})
+
+	return err
+}

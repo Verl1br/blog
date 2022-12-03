@@ -42,6 +42,7 @@ type Photo interface {
 type Friend interface {
 	GetFriends(id int) []model.User
 	CreateFriends(myId, friendId int) error
+	DeleteFriend(myId, friendId int) error
 }
 
 type Repository struct {
