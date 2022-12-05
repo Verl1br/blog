@@ -39,12 +39,17 @@ type Friend interface {
 	DeleteFriend(myId, friendId int) error
 }
 
+type NewsFeed interface {
+	GetNews(id int) ([]model.Post, error)
+}
+
 type Service struct {
 	Authorization
 	Post
 	Сomment
 	Photo
 	Friend
+	NewsFeed
 }
 
 func NewService(repo *repository.Repository) *Service {
@@ -54,5 +59,6 @@ func NewService(repo *repository.Repository) *Service {
 		Сomment:       NewCommentService(repo),
 		Photo:         NewPhotoService(repo),
 		Friend:        NewFriendServce(repo),
+		NewsFeed:      NewNewsFeedService(repo),
 	}
 }

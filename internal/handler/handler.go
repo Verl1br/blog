@@ -24,13 +24,6 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		auth.POST("/sing-in", h.signIn)
 	}
 
-	friend := router.Group("/friend", h.userIdentity)
-	{
-		friend.GET("/get-friends/:id", h.getFriends)
-		friend.POST("/create-friends/:id", h.createFriends)
-		friend.DELETE("/delete-friends/:id", h.deleteFriends)
-	}
-
 	post := router.Group("/post", h.userIdentity)
 	{
 		post.POST("/create-post", h.createPost)
@@ -47,6 +40,18 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		comment.GET("/get-comments", h.getComments)
 		comment.DELETE("/delete-comment/:id", h.deleteComment)
 		comment.PUT("/update-comment/:id", h.updateComment)
+	}
+
+	friend := router.Group("/friend", h.userIdentity)
+	{
+		friend.GET("/get-friends/:id", h.getFriends)
+		friend.POST("/create-friends/:id", h.createFriends)
+		friend.DELETE("/delete-friends/:id", h.deleteFriends)
+	}
+
+	newsfeed := router.Group("/newsfeed", h.userIdentity)
+	{
+		newsfeed.GET("/get-news/:id", h.getNews)
 	}
 
 	return router

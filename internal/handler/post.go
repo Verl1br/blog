@@ -29,6 +29,8 @@ func (h *Handler) createPost(c *gin.Context) {
 	post.Content = content
 	post.UserId = userId
 
+	logrus.Info(post)
+
 	err = h.validate.Struct(post)
 	if err != nil {
 		if _, ok := err.(*validator.InvalidValidationError); ok {
@@ -49,10 +51,15 @@ func (h *Handler) createPost(c *gin.Context) {
 		return
 	}
 
-	photoId, err := h.services.Photo.Upload(c, postId)
-	if err != nil {
-		logrus.Errorf("Upload Error: %s", err.Error())
-		return
+	var photoId int
+
+	_, ok := c.GetPostForm("post_id")
+	if ok {
+		photoId, err = h.services.Photo.Upload(c, postId)
+		if err != nil {
+			logrus.Errorf("Upload Error: %s", err.Error())
+			return
+		}
 	}
 
 	c.JSON(http.StatusOK, map[string]interface{}{

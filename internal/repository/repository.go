@@ -45,12 +45,17 @@ type Friend interface {
 	DeleteFriend(myId, friendId int) error
 }
 
+type NewsFeed interface {
+	GetNews(id int) ([]model.Post, error)
+}
+
 type Repository struct {
 	Authorization
 	Post
 	Сomment
 	Photo
 	Friend
+	NewsFeed
 }
 
 func NewRepository(db *sqlx.DB, driver neo4j.DriverWithContext) *Repository {
@@ -60,5 +65,6 @@ func NewRepository(db *sqlx.DB, driver neo4j.DriverWithContext) *Repository {
 		Сomment:       NewCommentRepository(db),
 		Photo:         NewPhotoRepository(db),
 		Friend:        NewFriendRepository(db, driver),
+		NewsFeed:      NewNewsFeedRepository(db, driver),
 	}
 }
