@@ -29,7 +29,7 @@ type Post interface {
 type Сomment interface {
 	CreateComment(comment model.Comment) (int, error)
 	GetComment(commentId int) (model.Comment, error)
-	GetComments() ([]model.Comment, error)
+	GetComments(id int) ([]model.Comment, error)
 	DeleteComment(commentId int) error
 	UpdateComment(commentId int, input model.UpdateComment) error
 }

@@ -72,7 +72,12 @@ func (h *Handler) getComment(c *gin.Context) {
 }
 
 func (h *Handler) getComments(c *gin.Context) {
-	comments, err := h.services.Сomment.GetComments()
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return
+	}
+
+	comments, err := h.services.Сomment.GetComments(id)
 	if err != nil {
 		logrus.Errorf("GetComments Error: %s", err.Error())
 		return

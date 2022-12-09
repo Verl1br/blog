@@ -4,6 +4,7 @@ import (
 	"github.com/dhevve/blog/internal/model"
 	"github.com/dhevve/blog/internal/repository"
 	"github.com/gin-gonic/gin"
+	"github.com/go-redis/redis/v8"
 )
 
 type Authorization interface {
@@ -23,7 +24,7 @@ type Post interface {
 type Сomment interface {
 	CreateComment(comment model.Comment) (int, error)
 	GetComment(commentId int) (model.Comment, error)
-	GetComments() ([]model.Comment, error)
+	GetComments(id int) ([]model.Comment, error)
 	DeleteComment(commentId int) error
 	UpdateComment(commentId int, input model.UpdateComment) error
 }
@@ -52,13 +53,13 @@ type Service struct {
 	NewsFeed
 }
 
-func NewService(repo *repository.Repository) *Service {
+func NewService(repo *repository.Repository, redisClient *redis.Client) *Service {
 	return &Service{
 		Authorization: NewAuthorizationService(repo),
 		Post:          NewPostService(repo),
 		Сomment:       NewCommentService(repo),
 		Photo:         NewPhotoService(repo),
 		Friend:        NewFriendServce(repo),
-		NewsFeed:      NewNewsFeedService(repo),
+		NewsFeed:      NewNewsFeedService(repo, redisClient),
 	}
 }

@@ -13,6 +13,7 @@ import (
 	"github.com/dhevve/blog/internal/repository"
 	"github.com/dhevve/blog/internal/service"
 	"github.com/go-playground/validator/v10"
+	"github.com/go-redis/redis/v8"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
@@ -51,8 +52,14 @@ func main() {
 		logrus.Fatalf("fail: %s", err)
 	}
 
+	redisClient := redis.NewClient(&redis.Options{
+		Addr:     viper.GetString("redis.port"),
+		Password: viper.GetString("redis.password"),
+		DB:       viper.GetInt("redis.DB"),
+	})
+
 	repo := repository.NewRepository(db, driver)
-	services := service.NewService(repo)
+	services := service.NewService(repo, redisClient)
 	handlers := handler.NewHandler(services, validate)
 	srv := new(blog.Server)
 

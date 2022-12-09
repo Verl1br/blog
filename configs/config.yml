@@ -1,6 +1,10 @@
 port: "8000"
-uri: "neo4j://localhost:7687/neo4j"
-username: "neo4j"
+
+redis:
+    port: "localhost:6379"
+    password: ""
+    DB: 0
+
 db:
     username: "postgres"
     host: "localhost"

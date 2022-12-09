@@ -37,11 +37,11 @@ func (r *CommentRepository) GetComment(commentId int) (model.Comment, error) {
 	return comment, err
 }
 
-func (r *CommentRepository) GetComments() ([]model.Comment, error) {
+func (r *CommentRepository) GetComments(id int) ([]model.Comment, error) {
 	var comments []model.Comment
 
-	query := fmt.Sprintf("SELECT * FROM %s", commentsTable)
-	err := r.db.Select(&comments, query)
+	query := fmt.Sprintf("SELECT * FROM %s WHERE post_id = $1", commentsTable)
+	err := r.db.Select(&comments, query, id)
 
 	return comments, err
 }

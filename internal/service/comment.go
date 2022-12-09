@@ -21,8 +21,8 @@ func (s *CommentService) GetComment(commentId int) (model.Comment, error) {
 	return s.repo.GetComment(commentId)
 }
 
-func (s *CommentService) GetComments() ([]model.Comment, error) {
-	return s.repo.GetComments()
+func (s *CommentService) GetComments(id int) ([]model.Comment, error) {
+	return s.repo.GetComments(id)
 }
 
 func (s *CommentService) DeleteComment(commentId int) error {
