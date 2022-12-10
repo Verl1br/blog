@@ -22,12 +22,11 @@ func NewFriendRepository(db *sqlx.DB, driver neo4j.DriverWithContext) *FriendRep
 	}
 }
 
-func (r *FriendRepository) GetFriends(id int) []model.User {
+func (r *FriendRepository) GetFriends(id int, ctx context.Context) []model.User {
 	var friends []model.User
 	var friend model.User
 
 	res := make([]int64, 0)
-	ctx := context.Background()
 
 	readFriendById := `
 			Match(:Friends{user_id: $id})<-[:FRIEND]-(m)
@@ -63,7 +62,7 @@ func (r *FriendRepository) GetFriends(id int) []model.User {
 	return friends
 }
 
-func (r *FriendRepository) CreateFriends(myId, friendId int) error {
+func (r *FriendRepository) CreateFriends(myId, friendId int, ctx context.Context) error {
 	res := make([]int64, 0)
 	readFriendById := `
 			Match(f:Friends{user_id: $id})
@@ -79,8 +78,6 @@ func (r *FriendRepository) CreateFriends(myId, friendId int) error {
 			CREATE (f:Friends { user_id: $id })
 			RETURN f.user_id
 	`
-
-	ctx := context.Background()
 
 	session := r.driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
 	defer session.Close(ctx)
@@ -141,9 +138,7 @@ func (r *FriendRepository) CreateFriends(myId, friendId int) error {
 	return err
 }
 
-func (r *FriendRepository) DeleteFriend(myId, friendId int) error {
-	ctx := context.Background()
-
+func (r *FriendRepository) DeleteFriend(myId, friendId int, ctx context.Context) error {
 	session := r.driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
 	defer session.Close(ctx)
 

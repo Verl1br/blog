@@ -21,7 +21,7 @@ func (h *Handler) getNews(c *gin.Context) {
 		return
 	}
 
-	posts, err := h.services.NewsFeed.GetNews(id)
+	posts, err := h.services.NewsFeed.GetNews(id, h.ctx)
 	if err != nil {
 		logrus.Errorf("GetNews Error: %s", err.Error())
 		return

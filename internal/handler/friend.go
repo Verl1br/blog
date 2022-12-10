@@ -15,7 +15,7 @@ func (h *Handler) getFriends(c *gin.Context) {
 		return
 	}
 	logrus.Info("GetFriends!")
-	friends := h.services.Friend.GetFriends(id)
+	friends := h.services.Friend.GetFriends(id, h.ctx)
 
 	c.JSON(http.StatusOK, friends)
 }
@@ -33,7 +33,7 @@ func (h *Handler) createFriends(c *gin.Context) {
 		return
 	}
 
-	err = h.services.Friend.CreateFriends(userId, id)
+	err = h.services.Friend.CreateFriends(userId, id, h.ctx)
 	if err != nil {
 		logrus.Fatalf("CreateFriends Error: %s", err.Error())
 	}
@@ -54,7 +54,7 @@ func (h *Handler) deleteFriends(c *gin.Context) {
 		return
 	}
 
-	err = h.services.Friend.DeleteFriend(userId, id)
+	err = h.services.Friend.DeleteFriend(userId, id, h.ctx)
 	if err != nil {
 		logrus.Fatalf("DeleteFriend Error: %s", err.Error())
 	}

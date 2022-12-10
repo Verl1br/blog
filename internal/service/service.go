@@ -1,6 +1,8 @@
 package service
 
 import (
+	"context"
+
 	"github.com/dhevve/blog/internal/model"
 	"github.com/dhevve/blog/internal/repository"
 	"github.com/gin-gonic/gin"
@@ -35,13 +37,13 @@ type Photo interface {
 }
 
 type Friend interface {
-	GetFriends(id int) []model.User
-	CreateFriends(myId, friendId int) error
-	DeleteFriend(myId, friendId int) error
+	GetFriends(id int, ctx context.Context) []model.User
+	CreateFriends(myId, friendId int, ctx context.Context) error
+	DeleteFriend(myId, friendId int, ctx context.Context) error
 }
 
 type NewsFeed interface {
-	GetNews(id int) ([]model.Post, error)
+	GetNews(id int, ctx context.Context) ([]model.Post, error)
 }
 
 type Service struct {

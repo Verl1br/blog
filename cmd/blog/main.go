@@ -22,6 +22,7 @@ import (
 )
 
 var validate *validator.Validate
+var ctx = context.Background()
 
 func main() {
 	if err := intiConfig(); err != nil {
@@ -60,7 +61,7 @@ func main() {
 
 	repo := repository.NewRepository(db, driver)
 	services := service.NewService(repo, redisClient)
-	handlers := handler.NewHandler(services, validate)
+	handlers := handler.NewHandler(services, validate, ctx)
 	srv := new(blog.Server)
 
 	go func() {

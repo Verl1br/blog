@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"context"
+
 	"github.com/dhevve/blog/internal/service"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -9,10 +11,15 @@ import (
 type Handler struct {
 	services *service.Service
 	validate *validator.Validate
+	ctx      context.Context
 }
 
-func NewHandler(service *service.Service, validate *validator.Validate) *Handler {
-	return &Handler{services: service, validate: validate}
+func NewHandler(service *service.Service, validate *validator.Validate, ctx context.Context) *Handler {
+	return &Handler{
+		services: service,
+		validate: validate,
+		ctx:      ctx,
+	}
 }
 
 func (h *Handler) InitRoutes() *gin.Engine {

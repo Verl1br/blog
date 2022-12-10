@@ -24,13 +24,12 @@ func NewNewsFeedService(repo repository.NewsFeed, redisClient *redis.Client) *Ne
 	}
 }
 
-func (s *NewsFeedService) GetNews(id int) ([]model.Post, error) {
+func (s *NewsFeedService) GetNews(id int, ctx context.Context) ([]model.Post, error) {
 	var news []model.Post
 
 	//stringId := strconv.Itoa(id)
 	stringId := fmt.Sprintf("news_%d", id)
 
-	ctx := context.Background()
 	cachedNews, err := s.redisClient.Get(ctx, stringId).Bytes()
 	if err != nil {
 		dbNews, err := s.repo.GetNews(id)

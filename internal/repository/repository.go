@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"context"
+
 	"github.com/dhevve/blog/internal/model"
 	"github.com/jmoiron/sqlx"
 	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
@@ -40,9 +42,9 @@ type Photo interface {
 }
 
 type Friend interface {
-	GetFriends(id int) []model.User
-	CreateFriends(myId, friendId int) error
-	DeleteFriend(myId, friendId int) error
+	GetFriends(id int, ctx context.Context) []model.User
+	CreateFriends(myId, friendId int, ctx context.Context) error
+	DeleteFriend(myId, friendId int, ctx context.Context) error
 }
 
 type NewsFeed interface {
