@@ -12,17 +12,17 @@ import (
 
 // TODO: change error test
 
-func TestPost_CreatePost(t *testing.T) {
+func TestComment_CreateComment(t *testing.T) {
 	db, mock, err := sqlmock.Newx()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
 	defer db.Close()
 
-	r := repository.NewPostRepository(db)
+	r := repository.NewCommentRepository(db)
 
 	type args struct {
-		item model.Post
+		item model.Comment
 	}
 
 	type mockBehavior func(args args, id int)
@@ -37,17 +37,17 @@ func TestPost_CreatePost(t *testing.T) {
 		{
 			name: "Ok",
 			input: args{
-				item: model.Post{
-					Title:   "Test title",
-					Content: "Test content",
-					UserId:  1,
+				item: model.Comment{
+					UserId: 1,
+					PostId: 1,
+					Text:   "test",
 				},
 			},
 			want: 1,
 			mock: func(args args, id int) {
 				rows := sqlmock.NewRows([]string{"id"}).AddRow(id)
-				mock.ExpectQuery("INSERT INTO posts").
-					WithArgs(args.item.Title, args.item.Content, args.item.UserId).WillReturnRows(rows)
+				mock.ExpectQuery("INSERT INTO posts_comments").
+					WithArgs(args.item.UserId, args.item.PostId, args.item.Text).WillReturnRows(rows)
 			},
 		},
 	}
@@ -56,7 +56,7 @@ func TestPost_CreatePost(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.mock(tt.input, tt.want)
 
-			got, err := r.CreatePost(tt.input.item)
+			got, err := r.CreateComment(tt.input.item)
 			if tt.wantErr {
 				assert.Error(t, err)
 			} else {
@@ -68,14 +68,14 @@ func TestPost_CreatePost(t *testing.T) {
 	}
 }
 
-func TestPost_GetByIdPost(t *testing.T) {
+func TestComment_GetByIdComment(t *testing.T) {
 	db, mock, err := sqlmock.Newx()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
 	defer db.Close()
 
-	r := repository.NewPostRepository(db)
+	r := repository.NewCommentRepository(db)
 
 	type args struct {
 		id int
@@ -84,23 +84,23 @@ func TestPost_GetByIdPost(t *testing.T) {
 	tests := []struct {
 		name    string
 		mock    func()
-		want    model.Post
+		want    model.Comment
 		input   args
 		wantErr bool
 	}{
 		{
 			name: "Ok",
 			mock: func() {
-				rows := sqlmock.NewRows([]string{"id", "title", "content", "user_id"}).
-					AddRow(1, "test", "test", 1)
+				rows := sqlmock.NewRows([]string{"id", "user_id", "post_id", "comment"}).
+					AddRow(1, 1, 1, "test")
 
-				mock.ExpectQuery("SELECT (.+) FROM posts WHERE (.+)").
-					WithArgs(1, 1).WillReturnRows(rows)
+				mock.ExpectQuery("SELECT (.+) FROM posts_comments WHERE (.+)").
+					WithArgs(1).WillReturnRows(rows)
 			},
 			input: args{
 				id: 1,
 			},
-			want: model.Post{Id: 1, Title: "test", Content: "test", UserId: 1},
+			want: model.Comment{Id: 1, UserId: 1, PostId: 1, Text: "test"},
 		},
 		/*{
 			name: "Not Found",
@@ -121,7 +121,7 @@ func TestPost_GetByIdPost(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.mock()
 
-			got, err := r.GetPost(tt.input.id, 1)
+			got, err := r.GetComment(1)
 			if tt.wantErr {
 				assert.Error(t, err)
 			} else {
@@ -133,14 +133,14 @@ func TestPost_GetByIdPost(t *testing.T) {
 	}
 }
 
-func TestPost_GetPosts(t *testing.T) {
+func TestComment_GetComments(t *testing.T) {
 	db, mock, err := sqlmock.Newx()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
 	defer db.Close()
 
-	r := repository.NewPostRepository(db)
+	r := repository.NewCommentRepository(db)
 
 	type args struct {
 		id int
@@ -150,24 +150,24 @@ func TestPost_GetPosts(t *testing.T) {
 		name    string
 		mock    func()
 		input   args
-		want    []model.Post
+		want    []model.Comment
 		wantErr bool
 	}{
 		{
 			name: "Ok",
 			mock: func() {
-				rows := sqlmock.NewRows([]string{"id", "title", "content", "user_id"}).
-					AddRow(1, "test", "test", 1).
-					AddRow(2, "test", "test", 1).
-					AddRow(3, "test", "test", 1)
+				rows := sqlmock.NewRows([]string{"id", "user_id", "post_id", "comment"}).
+					AddRow(1, 1, 1, "test").
+					AddRow(2, 1, 1, "test").
+					AddRow(3, 1, 1, "test")
 
-				mock.ExpectQuery("SELECT (.+) FROM posts WHERE (.+)").
+				mock.ExpectQuery("SELECT (.+) FROM posts_comments WHERE (.+)").
 					WithArgs(1).WillReturnRows(rows)
 			},
-			want: []model.Post{
-				{Id: 1, Title: "test", Content: "test", UserId: 1},
-				{Id: 2, Title: "test", Content: "test", UserId: 1},
-				{Id: 3, Title: "test", Content: "test", UserId: 1},
+			want: []model.Comment{
+				{Id: 1, UserId: 1, PostId: 1, Text: "test"},
+				{Id: 2, UserId: 1, PostId: 1, Text: "test"},
+				{Id: 3, UserId: 1, PostId: 1, Text: "test"},
 			},
 			input: args{
 				id: 1,
@@ -192,7 +192,7 @@ func TestPost_GetPosts(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.mock()
 
-			got, err := r.GetPosts(tt.input.id)
+			got, err := r.GetComments(1)
 			if tt.wantErr {
 				assert.Error(t, err)
 			} else {
@@ -204,14 +204,14 @@ func TestPost_GetPosts(t *testing.T) {
 	}
 }
 
-func TestPost_Delete(t *testing.T) {
+func TestComment_Delete(t *testing.T) {
 	db, mock, err := sqlmock.Newx()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
 	defer db.Close()
 
-	r := repository.NewPostRepository(db)
+	r := repository.NewCommentRepository(db)
 
 	type args struct {
 		id int
@@ -226,7 +226,7 @@ func TestPost_Delete(t *testing.T) {
 		{
 			name: "Ok",
 			mock: func() {
-				mock.ExpectExec("DELETE FROM posts WHERE (.+)").
+				mock.ExpectExec("DELETE FROM posts_comments WHERE (.+)").
 					WithArgs(1).WillReturnResult(sqlmock.NewResult(0, 1))
 			},
 			input: args{
@@ -236,7 +236,7 @@ func TestPost_Delete(t *testing.T) {
 		{
 			name: "Not Found",
 			mock: func() {
-				mock.ExpectExec("DELETE FROM posts WHERE (.+)").
+				mock.ExpectExec("DELETE FROM posts_comments WHERE (.+)").
 					WithArgs(404).WillReturnError(sql.ErrNoRows)
 			},
 			input: args{
@@ -250,7 +250,7 @@ func TestPost_Delete(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.mock()
 
-			err := r.DeletePost(tt.input.id)
+			err := r.DeleteComment(tt.input.id)
 			if tt.wantErr {
 				assert.Error(t, err)
 			} else {
@@ -261,19 +261,18 @@ func TestPost_Delete(t *testing.T) {
 	}
 }
 
-func TestPost_Update(t *testing.T) {
+func TestComment_Update(t *testing.T) {
 	db, mock, err := sqlmock.Newx()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
 	defer db.Close()
 
-	r := repository.NewPostRepository(db)
+	r := repository.NewCommentRepository(db)
 
 	type args struct {
 		postId int
-		userId int
-		input  model.UpdatePost
+		input  model.UpdateComment
 	}
 	tests := []struct {
 		name    string
@@ -284,15 +283,13 @@ func TestPost_Update(t *testing.T) {
 		{
 			name: "OK_AllFields",
 			mock: func() {
-				mock.ExpectExec("UPDATE posts SET (.+) WHERE (.+)").
-					WithArgs("test", "test", 1).WillReturnResult(sqlmock.NewResult(0, 1))
+				mock.ExpectExec("UPDATE posts_comments SET (.+) WHERE (.+)").
+					WithArgs("test", 1).WillReturnResult(sqlmock.NewResult(0, 1))
 			},
 			input: args{
 				postId: 1,
-				userId: 1,
-				input: model.UpdatePost{
-					Title:   stringPointer("test"),
-					Content: stringPointer("test"),
+				input: model.UpdateComment{
+					Text: stringPointer("test"),
 				},
 			},
 		},
@@ -302,7 +299,7 @@ func TestPost_Update(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.mock()
 
-			err := r.UpdatePost(1, tt.input.input)
+			err := r.UpdateComment(1, tt.input.input)
 			if tt.wantErr {
 				assert.Error(t, err)
 			} else {
@@ -311,8 +308,4 @@ func TestPost_Update(t *testing.T) {
 			assert.NoError(t, mock.ExpectationsWereMet())
 		})
 	}
-}
-
-func stringPointer(s string) *string {
-	return &s
 }
